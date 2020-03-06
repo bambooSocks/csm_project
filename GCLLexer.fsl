@@ -12,39 +12,39 @@ let whitespace  = [' ' '\t' '\n' '\r']
 let newline     = "\n\r" | '\n' | '\r'
 
 rule tokenize = parse
-| "if"          { IF }
-| "fi"          { FI }
-| "do"          { DO }
-| "od"          { OD }
-| whitespace    { tokenize lexbuf }
-| newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
-| ":="          { ASSIGN }
-| vars          { VAR(LexBuffer<_>.LexemeString lexbuf) }
-| ';'           { CMDSEQ }
-| "->"          { ARROW }
-| "[]"          { GCSEQ }
-| '['           { LBRAC }
-| ']'           { RBRAC }
-| "skip"        { SKIP }
-| "true"        { TRUE }
-| "false"       { FALSE }
-| "&&"          { SHORTAND }
-| "||"          { SHORTOR }
-| '&'           { AND }
-| '|'           { OR }
-| "!="          { NEQ }
-| ">="          { GTE }
-| "<="          { LTE }
-| '!'           { NOT }
-| '='           { EQ }
-| '<'           { LT }
-| '>'           { GT }
-| num           { NUM(Int32.Parse(LexBuffer<_>.LexemeString lexbuf)) }
-| '*'           { MUL }
-| '/'           { DIV }
-| '+'           { PLUS }
-| '-'           { MINUS }
-| '^'           { POW }
-| '('           { LPAR }
-| ')'           { RPAR }
-| eof           { EOF }
+| "if"whitespace    { IF }
+| whitespace"fi"    { FI }
+| "do"whitespace    { DO }
+| whitespace"od"    { OD }
+| whitespace        { tokenize lexbuf }
+| newline           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
+| ":="              { ASSIGN }
+| vars              { VAR(LexBuffer<_>.LexemeString lexbuf) }
+| ';'               { CMDSEQ }
+| "->"              { ARROW }
+| "[]"              { GCSEQ }
+| '['               { LBRAC }
+| ']'               { RBRAC }
+| "skip"            { SKIP }
+| "true"            { TRUE }
+| "false"           { FALSE }
+| "&&"              { SHORTAND }
+| "||"              { SHORTOR }
+| '&'               { AND }
+| '|'               { OR }
+| "!="              { NEQ }
+| ">="              { GTE }
+| "<="              { LTE }
+| '!'               { NOT }
+| '='               { EQ }
+| '<'               { LT }
+| '>'               { GT }
+| num               { NUM(Int32.Parse(LexBuffer<_>.LexemeString lexbuf)) }
+| '*'               { MUL }
+| '/'               { DIV }
+| '+'               { PLUS }
+| '-'               { MINUS }
+| '^'               { POW }
+| '('               { LPAR }
+| ')'               { RPAR }
+| eof               { EOF }
