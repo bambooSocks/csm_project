@@ -1,0 +1,29 @@
+{
+module GCLLexer
+open FSharp.Text.Lexing
+open System
+open GCLParser
+}
+
+let digit       = ['0'-'9']
+let num         = digit+ ( '.' digit+)?  ('E' ('+'|'-')? digit+ )?
+let whitespace  = [' ' '\t']
+let newline     = "\n\r" | '\n' | '\r'
+
+rule tokenize = parse
+// deal with tokens that need to be ignored (skip them)
+| whitespace    { tokenize lexbuf }
+| newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
+// deal with tokens that need to be built
+| num           { NUM(Double.Parse(LexBuffer<_>.LexemeString lexbuf)) }
+| '*'           { TIMES }
+| '/'           { DIV }
+| '+'           { PLUS }
+| '-'           { MINUS }
+| '^'           { POW }
+| '('           { LPAR }
+| ')'           { RPAR }
+| "sqrt"        { SQRT }
+| "log"         { LOG }
+| "ln"          { LN }
+| eof           { EOF }
