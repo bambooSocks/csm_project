@@ -19,12 +19,12 @@ type BExp =
       | ShortAndExp of (BExp*BExp)
       | ShortOrExp of (BExp*BExp)
       | NotExp of BExp
-      | EqExp of (BExp*BExp)
-      | NotEqExp of (BExp*BExp)
-      | GreaterExp of (BExp*BExp)
-      | GreaterEqExp of (BExp*BExp)
-      | LessExp of (BExp*BExp)
-      | LessEqExp of (BExp*BExp)
+      | EqExp of (AExp*AExp)
+      | NotEqExp of (AExp*AExp)
+      | GreaterExp of (AExp*AExp)
+      | GreaterEqExp of (AExp*AExp)
+      | LessExp of (AExp*AExp)
+      | LessEqExp of (AExp*AExp)
 
 type CExp = 
       | Assignment of (string*AExp)
@@ -34,9 +34,7 @@ type CExp =
       | IfExp of GCExp
       | DoExp of GCExp
 
-   and 
-
-type GCExp = 
+and GCExp = 
       | GC of (BExp*CExp)
       | GCSeq of (GCExp*GCExp)
         

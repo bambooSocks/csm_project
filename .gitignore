@@ -1,2 +1,8 @@
 obj/
 .ionide/
+
+GCLLexer.fs
+
+GCLParser.fs
+
+GCLParser.fsi
