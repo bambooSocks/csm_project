@@ -5,25 +5,45 @@ open System
 open GCLParser
 }
 
-let digit       = ['0'-'9']
-let num         = digit+ ( '.' digit+)?  ('E' ('+'|'-')? digit+ )?
-let whitespace  = [' ' '\t']
+let vars        = ['a'-'z''A'-'Z']['a'-'z''A'-'Z'\d_]*
+let num         = \d+
+let whitespace  = [' ' '\t' '\n' '\r']
 let newline     = "\n\r" | '\n' | '\r'
 
 rule tokenize = parse
-// deal with tokens that need to be ignored (skip them)
+| "if"          { IF }
+| "fi"          { FI }
+| "do"          { DO }
+| "od"          { OD }
 | whitespace    { tokenize lexbuf }
 | newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
-// deal with tokens that need to be built
-| num           { NUM(Double.Parse(LexBuffer<_>.LexemeString lexbuf)) }
-| '*'           { TIMES }
+| ":="          { ASSIGN }
+| vars          { VAR }
+| ';'           { CMDSEQ }
+| "->"          { ARROW }
+| "[]"          { GCSEQ }
+| '['           { LBRAC }
+| ']'           { RBRAC }
+| "skip"        { SKIP }
+| "true"        { TRUE }
+| "false"       { FALSE }
+| "&&"          { SHORTAND }
+| "||"          { SHORTOR }
+| '&'           { AND }
+| '|'           { OR }
+| "!="          { NEQ }
+| ">="          { GTE }
+| "<="          { LTE }
+| '!'           { NOT }
+| '='           { EQ }
+| '<'           { LT }
+| '>'           { GT }
+| num           { NUM(Integer.Parse(LexBuffer<_>.LexemeString lexbuf)) }
+| '*'           { MUL }
 | '/'           { DIV }
 | '+'           { PLUS }
 | '-'           { MINUS }
 | '^'           { POW }
 | '('           { LPAR }
 | ')'           { RPAR }
-| "sqrt"        { SQRT }
-| "log"         { LOG }
-| "ln"          { LN }
 | eof           { EOF }
