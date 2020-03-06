@@ -13,7 +13,28 @@ open GCLTypesAST
 
 // Specify precedence and associativity of operators
 // Precedence is given by the order (from low to high)
-%precedence
+
+//specify precedence and associativity of operator for BEXp
+%left SHORTOR OR 
+%left SHORTAND AND
+%right NOT
+
+//specify precedence and associativity of operator for AExp
+%left PLUS MINUS
+%left MUL DIV
+%left POW
+
+//specify precedence and associativity of operator for CExp
+%right ASSIGN
+%right SKIP 
+%right CMDSEQ 
+%right IF FI
+%right DO OD 
+
+//specify precedence and associativity of operator for GCExp
+
+%right ARROW
+
 
 // We declare the initial non-terminal symbol
 %start start
