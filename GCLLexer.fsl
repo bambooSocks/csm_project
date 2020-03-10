@@ -6,7 +6,7 @@ open GCLParser
 }
 
 let digit       = ['0'-'9']
-let vars        = ['a'-'z''A'-'Z'](['a'-'z''A'-'Z''_']digit)*
+let vars        = ['a'-'z''A'-'Z'](['a'-'z''A'-'Z']|'_'|digit)*
 let num         = digit+
 let whitespace  = [' ' '\t' '\n' '\r']
 let newline     = "\n\r" | '\n' | '\r'
@@ -19,7 +19,6 @@ rule tokenize = parse
 | whitespace        { tokenize lexbuf }
 | newline           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; tokenize lexbuf; }
 | ":="              { ASSIGN }
-| vars              { VAR(LexBuffer<_>.LexemeString lexbuf) }
 | ';'               { CMDSEQ }
 | "->"              { ARROW }
 | "[]"              { GCSEQ }
@@ -39,6 +38,7 @@ rule tokenize = parse
 | '='               { EQ }
 | '<'               { LT }
 | '>'               { GT }
+| vars              { VAR(LexBuffer<_>.LexemeString lexbuf) }
 | num               { NUM(Int32.Parse(LexBuffer<_>.LexemeString lexbuf)) }
 | '*'               { MUL }
 | '/'               { DIV }
