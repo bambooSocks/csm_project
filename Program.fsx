@@ -18,5 +18,9 @@ let parse input =
 let code = System.IO.File.ReadAllText "./code.gc"
 
 // printfn "%A" code
-printfn "%A" (parse code)    
 
+try
+    printfn "%A" (parse code)    
+with
+    err -> printfn "An error has occured"
+           printfn "%A" err
