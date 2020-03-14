@@ -1,4 +1,4 @@
-﻿#r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
+#r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
 open FSharp.Text.Lexing
 open System
 #load "GCLTypesAST.fs"
@@ -7,6 +7,10 @@ open GCLTypesAST
 open GCLParser
 #load "GCLLexer.fs"
 open GCLLexer
+#load "PGGenerator.fs"
+open PGGenerator
+#load "GraphvizGenerator.fs"
+open GraphvizGenerator
 
 let parse input =
     // translate string into a buffer of characters

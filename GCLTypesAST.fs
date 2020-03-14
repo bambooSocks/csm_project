@@ -38,3 +38,11 @@ and GCExp =
       | GC of (BExp*CExp)
       | GCSeq of (GCExp*GCExp)
         
+
+type Exp =
+    | A of AExp
+    | B of BExp
+    | C of CExp
+    | G of GCExp
+   
+
