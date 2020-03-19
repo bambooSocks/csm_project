@@ -12,6 +12,10 @@ open PGGenerator
 #load "GraphvizGenerator.fs"
 open GraphvizGenerator
 
+let programArgs = fsi.CommandLineArgs |> Array.toList
+
+let rec getDet = List.contains "-d" programArgs   
+
 let parse input =
     // translate string into a buffer of characters
     let lexbuf = LexBuffer<char>.FromString input
@@ -20,11 +24,14 @@ let parse input =
     // return the result of parsing (i.e. value of type "expr")
     res
 let code = System.IO.File.ReadAllText "./code.gc"
-
-// printfn "%A" code
+let ast = parse code
+let edges = edgesC StartNode EndNode Set.empty getDet ast
+let graphviz = generateGraphviz (Set.toList edges)
 
 try
-    printfn "%A" (parse code)    
+    printfn "%A" ast
+    printfn "%A" edges
+    printfn "%A" graphviz
 with
     err -> printfn "An error has occured"
            printfn "%A" err
