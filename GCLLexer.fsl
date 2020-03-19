@@ -38,8 +38,6 @@ rule tokenize = parse
 | '='               { EQ }
 | '<'               { LT }
 | '>'               { GT }
-| vars              { VAR(LexBuffer<_>.LexemeString lexbuf) }
-| num               { NUM(Int32.Parse(LexBuffer<_>.LexemeString lexbuf)) }
 | '*'               { MUL }
 | '/'               { DIV }
 | '+'               { PLUS }
@@ -47,4 +45,6 @@ rule tokenize = parse
 | '^'               { POW }
 | '('               { LPAR }
 | ')'               { RPAR }
+| vars              { VAR(LexBuffer<_>.LexemeString lexbuf) }
+| num               { NUM(Int32.Parse(LexBuffer<_>.LexemeString lexbuf)) }
 | eof               { EOF }

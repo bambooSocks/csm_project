@@ -6,7 +6,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Program.fs"/>
+        <Compile Include="Program.fs" />
+        <Compile Include="GCLLexer.fs" />
+        <Content Include="GCLLexer.fsl" />
+        <Compile Include="GCLParser.fs" />
+        <Compile Include="GCLParser.fsi" />
+        <Content Include="GCLParser.fsp" />
+        <Compile Include="GCLTypesAST.fs" />
+        <Compile Include="GraphvizGenerator.fs" />
+        <Compile Include="PGGenerator.fs" />
+        <None Include="Program.fsx" />
+        <Content Include="Makefile" />
     </ItemGroup>
 
 </Project>

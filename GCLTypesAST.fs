@@ -8,7 +8,7 @@ type AExp =
       | Minus of (AExp*AExp)
       | Mul of (AExp*AExp)
       | Div of (AExp*AExp)
-      | UnaryMinus of (AExp)
+      | UnaryMinus of AExp
       | Pow of (AExp*AExp)
 
 type BExp =

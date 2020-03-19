@@ -8,7 +8,7 @@ open GCLTypesAST
 %token <string> VAR
 %token IF FI DO OD ASSIGN CMDSEQ ARROW GCSEQ LBRAC RBRAC
        SKIP TRUE FALSE SHORTAND SHORTOR AND OR NEQ GTE LTE 
-       NOT EQ LT GT MUL DIV PLUS MINUS POW LPAR RPAR EOF
+       NOT EQ LT GT MUL DIV PLUS MINUS POW UMINUS LPAR RPAR EOF
 // NOTE: the actual formats of these tokens are defined in the lexer file
 //       as regular expressions
 
@@ -24,6 +24,7 @@ open GCLTypesAST
 %left PLUS MINUS
 %left MUL DIV
 %left POW
+%left UMINUS
 
 //specify precedence and associativity of operator for CExp
 %right ASSIGN
@@ -35,7 +36,6 @@ open GCLTypesAST
 //specify precedence and associativity of operator for GCExp
 
 %right ARROW
-
 
 // We declare the initial non-terminal symbol
 %start start
@@ -66,11 +66,11 @@ aexp:
   NUM                               { Num($1) }
   | VAR LBRAC aexp RBRAC            { Array($1, $3) }
   | VAR                             { Var($1) }
+  | MINUS aexp %prec UMINUS         { UnaryMinus($2) }
   | aexp MUL aexp                   { Mul($1, $3) }
   | aexp DIV aexp                   { Div($1, $3) }
   | aexp PLUS aexp                  { Plus($1, $3) }
   | aexp MINUS aexp                 { Minus($1, $3) }
-  | MINUS aexp                      { UnaryMinus($2) }
   | aexp POW aexp                   { Pow($1, $3) }
   | LPAR aexp RPAR                  { $2 }
 
