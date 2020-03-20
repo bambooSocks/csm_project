@@ -6,3 +6,5 @@ GCLLexer.fs
 GCLParser.fs
 
 GCLParser.fsi
+
+.idea/
