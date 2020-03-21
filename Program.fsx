@@ -14,7 +14,7 @@ open GraphvizGenerator
 
 let programArgs = fsi.CommandLineArgs |> Array.toList
 
-let rec getDet = List.contains "-d" programArgs   
+let getDet = List.contains "-d" programArgs   
 
 let parse input =
     // translate string into a buffer of characters
@@ -25,7 +25,7 @@ let parse input =
     res
 let code = System.IO.File.ReadAllText "./code.gc"
 let ast = parse code
-let edges = edgesC StartNode EndNode Set.empty getDet ast
+let edges = edgesC (Node 0) EndNode Set.empty getDet ast
 let graphviz = generateGraphviz (Set.toList edges)
 
 try

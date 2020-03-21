@@ -20,8 +20,8 @@ let rec toStringA addPar aexp =
             | Pow (ex1, ex2)   -> sprintf "%s ^ %s" (toStringA true ex1) (toStringA true ex2)
 
 let addParB s = function
-    | TExp | FExp -> s
-    | _           -> sprintf "(%s)" s
+    | TExp | FExp | NotExp _ -> s
+    | _                      -> sprintf "(%s)" s
 
 let rec toStringB addPar bexp = 
     if addPar then
@@ -55,14 +55,13 @@ let toString = function
     | _      -> failwith "wrong input"
 
 let toStringN = function
-    | StartNode -> "q▷"
+    | Node 0    -> "q▷"
     | EndNode   -> "q◀"
     | Node n    ->  sprintf "q%d" n
 
 let rec generateGraphviz_aux s = function
     | []                -> sprintf "%s\n}" s
-    | (q1, exp, q2)::xs -> let label = toString exp
-                           let acc = sprintf "%s\r\n%s -> %s [label=\"%s\"];" s (toStringN q1) (toStringN q2) label
+    | (q1, exp, q2)::xs -> let acc = sprintf "%s\r\n%s -> %s [label=\"%s\"];" s (toStringN q1) (toStringN q2) (toString exp)
                            generateGraphviz_aux acc xs
 
 let generateGraphviz edges =
