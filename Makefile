@@ -3,8 +3,6 @@
 
 
 all:
-	@echo $(FS)
-	@echo $(MONO)
 	@echo "Help:"
 	@echo "  make run      - run the program in non-deterministic mode"
 	@echo "  make run_d    - run the program in deterministic mode"

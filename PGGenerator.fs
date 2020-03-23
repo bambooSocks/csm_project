@@ -2,17 +2,11 @@ module PGGenerator
 
 let mutable nodeNumbers = Set.empty //set of node numbers
 
-type NodeType = | StartNode
-                | EndNode
+type NodeType = | EndNode
                 | Node of int
 
 let rec newNode node = 
     match node with
-    | StartNode -> if Set.contains 1 nodeNumbers then
-                       newNode (Node 1)
-                   else
-                       nodeNumbers <- Set.add 1 nodeNumbers 
-                       Node 1
     | EndNode -> failwith("cannot append a node")
     | Node n -> if Set.contains (n+1) nodeNumbers then
                     newNode (Node(n+1))
