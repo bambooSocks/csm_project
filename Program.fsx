@@ -11,6 +11,8 @@ open GCLLexer
 open PGGenerator
 #load "GraphvizGenerator.fs"
 open GraphvizGenerator
+#load "Interpreter.fs"
+open Interpreter
 
 let programArgs = fsi.CommandLineArgs |> Array.toList
 
@@ -27,11 +29,13 @@ let code = System.IO.File.ReadAllText "./code.gc"
 let ast = parse code
 let edges = edgesC (Node 0) EndNode Set.empty getDet ast
 let graphviz = generateGraphviz (Set.toList edges)
+let branch = chooseBranch (Node 0) (Map.ofList [("x",1);("y",2)]) edges
 
 try
-    printfn "%A" ast
+    // printfn "%A" ast
     printfn "%A" edges
-    printfn "%A" graphviz
+    // printfn "%A" graphviz
+    printfn "%A" branch
 with
     err -> printfn "An error has occured"
            printfn "%A" err
