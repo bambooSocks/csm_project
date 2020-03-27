@@ -48,7 +48,8 @@ and edgesG n1 n2 output isDet d = function
                                     let s = Set.add (n1, B(ShortAndExp(guard, (NotExp dexp))), q) output
                                     edgesC q n2 s isDet cmd
 
-    | GC (guard, cmd)            -> let s = Set.add (n1, B(guard), q) output
+    | GC (guard, cmd)            -> let q = newNode n1
+                                    let s = Set.add (n1, B(guard), q) output
                                     edgesC q n2 s isDet cmd                      
                               
     | GCSeq (gc1, gc2)           -> let e1 = edgesG n1 n2 output isDet d gc1 
