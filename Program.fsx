@@ -30,7 +30,7 @@ let ast = parse code
 let edges = edgesC (Node 0) EndNode Set.empty getDet ast
 let graphviz = generateGraphviz (Set.toList edges)
 let branch = chooseBranch (Node 0) (Map.ofList [("x",1);("y",2)]) edges
-let testExec = execA (Map.ofList [("x",0);("y",3)]) (Plus (Var "y", Var "x") ) 
+let testExec = execB (Map.ofList [("x",0);("y",3)]) (NotExp (LessExp(Num 1, Num 2)) ) 
 
 try
     // printfn "%A" ast

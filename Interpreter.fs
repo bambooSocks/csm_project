@@ -58,8 +58,17 @@ and applyOpAB a1 a2 op mem : bool option =
     else 
        None  
 
+and applyS a1 a2 op mem :bool option = 
+    let z1 = execB mem a1
+    let z2 = execB mem a2
+    if z1.IsNone then None
+    else
+        if z1.IsSome && z2.IsSome then
+            Some (op z1.Value z2.Value)
+        else
+            Some false 
+
 // returns option boolean
-//no distinction between logical conjunction and short circuit and/or
 and execB mem bexp : bool option =
     match bexp with
     | TExp                 -> Some true
@@ -71,10 +80,14 @@ and execB mem bexp : bool option =
     | LessExp (a1,a2)      -> applyOpAB a1 a2 (<) mem
     | LessEqExp (a1,a2)    -> applyOpAB a1 a2 (<=) mem                   
     | OrExp (b1,b2)        -> applyOpB b1 b2 (||) mem
-    | ShortOrExp (b1,b2)   -> applyOpB b1 b2 (||) mem                                                       
+    | ShortOrExp (b1,b2)   -> applyS b1 b2 (||) mem                                                       
     | AndExp (b1, b2)      -> applyOpB b1 b2 (&&) mem
-    | ShortAndExp (b1, b2) -> applyOpB b1 b2 (&&) mem   
-    | NotExp b1            -> None // FIXME: Some (not(execB mem b1))                  
+    | ShortAndExp (b1, b2) -> applyS b1 b2 (&&) mem   
+    | NotExp b1            -> let z = execB mem b1
+                              if z.IsSome then 
+                                 Some (not z.Value) 
+                              else 
+                                 None                 
 
 // returns option memory (Map string and int)
 let exec mem exp : Map<string, int> option=
