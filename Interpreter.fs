@@ -1,18 +1,21 @@
 module Interpreter
 
+let applyOperator a1 a2 op = 
+    let z1 = execA mem a1
+    let z2 = execA mem a2
+    if z1.IsSome && z2.IsSome then 
+       Some (op z1.Value z2.Value)
+    else 
+       None 
+
 // returns option int
-let rec execA mem = function
+and rec execA mem = function
     | Var v            -> if (Map.containsKey v mem) then
                              Some (Map.find v mem)
                           else
                              None
     | Num n            -> Some n
-    | Plus (a1,a2)     -> let z1 = execA mem a1
-                          let z2 = execA mem a2
-                          if z1.IsSome && z2.IsSome then 
-                             Some (z1.Value + z2.Value)
-                          else 
-                             None 
+    | Plus (a1,a2)     -> applyOperator a1 a2 (+) 
     | Minus (a1,a2)    -> let z1 = execA mem a1
                           let z2 = execA mem a2
                           if z1.IsSome && z2.IsSome then 
@@ -34,7 +37,7 @@ let rec execA mem = function
     | Pow (a1,a2)      -> let z1 = execA mem a1
                           let z2 = execA mem a2
                           if z1.IsSome && z2.IsSome && (z2.Value >=0) then 
-                          let res = flzt(z1.Value) ** flzt(z2.Value)
+                          let res = float(z1.Value) ** float(z2.Value)
                              Some (int(res))
                           else 
                              None 
@@ -43,7 +46,8 @@ let rec execA mem = function
                              Some (-z1)
                           else 
                              None
-    | Array (var, ind) -> if mem.containsKey var then 
+    | Array (var, ind) -> if mem.containsKey var then
+                             // FIXME
                              Some((Map.find var mem).[ind]) 
                           else
                              None
@@ -56,12 +60,13 @@ let rec execA mem = function
 let rec execB mem = function
     | TExp                 -> Some true
     | FExp                 -> Some false
-    | EqExp (a1, a2)       -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                 None
-                              else
-                                 Some (z1.Value = z2.Value)
+    | EqExp (a1, a2)       -> applyOperator a1 a2 (=)
+                            //   let z1 = execA mem a1
+                            //   let z2 = execA mem a2
+                            //   if (z1.IsNone || z2.IsNone) then
+                            //      None
+                            //   else
+                            //      Some (z1.Value = z2.Value)
     | NotEqExp (a1,a2)     -> let z1 = execA mem a1
                               let z2 = execA mem a2
                               if (z1.IsNone || z2.IsNone) then

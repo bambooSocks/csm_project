@@ -31,6 +31,8 @@ let edges = edgesC (Node 0) EndNode Set.empty getDet ast
 let graphviz = generateGraphviz (Set.toList edges)
 let branch = chooseBranch (Node 0) (Map.ofList [("x",1);("y",2)]) edges
 
+testExec
+
 try
     // printfn "%A" ast
     printfn "%A" edges
