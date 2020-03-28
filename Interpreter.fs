@@ -1,6 +1,6 @@
 module Interpreter
 
-let applyOperator a1 a2 op = 
+let rec applyOpA a1 a2 op (mem:Map<string,int>)= 
     let z1 = execA mem a1
     let z2 = execA mem a2
     if z1.IsSome && z2.IsSome then 
@@ -8,121 +8,60 @@ let applyOperator a1 a2 op =
     else 
        None 
 
+
 // returns option int
-and rec execA mem = function
+and execA mem = function
     | Var v            -> if (Map.containsKey v mem) then
                              Some (Map.find v mem)
                           else
                              None
     | Num n            -> Some n
-    | Plus (a1,a2)     -> applyOperator a1 a2 (+) 
-    | Minus (a1,a2)    -> let z1 = execA mem a1
-                          let z2 = execA mem a2
-                          if z1.IsSome && z2.IsSome then 
-                             Some (z1.Value - z2.Value)
-                          else 
-                             None 
-    | Mul (a1,a2)      -> let z1 = execA mem a1
-                          let z2 = execA mem a2
-                          if z1.IsSome && z2.IsSome then 
-                             Some (z1.Value * z2.Value)
-                          else 
-                             None  
-    | Div (a1,a2)      -> let z1 = execA mem a1
-                          let z2 = execA mem a2
-                          if z1.IsSome && z2.IsSome then 
-                             Some (z1.Value / z2.Value)
-                          else 
-                             None       
-    | Pow (a1,a2)      -> let z1 = execA mem a1
-                          let z2 = execA mem a2
+    | Plus (a1,a2)     -> applyOpA a1 a2 (+) mem
+    | Minus (a1,a2)    -> applyOpA a1 a2 (-) mem
+    | Mul (a1,a2)      -> applyOpA a1 a2 ( * ) mem
+    | Div (a1,a2)      -> applyOpA a1 a2 (/) mem     
+    | Pow (a1,a2)      -> let z2 = execA mem a2
                           if z1.IsSome && z2.IsSome && (z2.Value >=0) then 
-                          let res = float(z1.Value) ** float(z2.Value)
-                             Some (int(res))
+                             Some (int(float(z1.Value) ** float(z2.Value)))
                           else 
                              None 
     | UnaryMinus a1    -> let z1 = execA mem a1
-                          if z1.IsSome
+                          if z1.IsSome then
                              Some (-z1)
                           else 
                              None
-    | Array (var, ind) -> if mem.containsKey var then
-                             // FIXME
-                             Some((Map.find var mem).[ind]) 
+    | Array (var, ind) -> let varName = (sprintf "%s[%i]" var ind)
+                          if mem.containsKey varName then
+                             Some (Map.find varName mem)  
                           else
                              None
 
-
   
+let rec applyOpB a1 a2 op mem= 
+               let z1 = execB mem a1
+               let z2 = execB mem a2
+               if (z1.IsSome && z2.IsSome) then
+                  Some ( op z1.Value z2.Value)
+               else 
+                  None  
+
 
 // returns option boolean
 //no distinction between logical conjunction and short circuit and/or
-let rec execB mem = function
+and execB mem = function
     | TExp                 -> Some true
     | FExp                 -> Some false
-    | EqExp (a1, a2)       -> applyOperator a1 a2 (=)
-                            //   let z1 = execA mem a1
-                            //   let z2 = execA mem a2
-                            //   if (z1.IsNone || z2.IsNone) then
-                            //      None
-                            //   else
-                            //      Some (z1.Value = z2.Value)
-    | NotEqExp (a1,a2)     -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                None
-                              else
-                                 Some (not(z1.Value = z2.Value))
-    | GreaterExp (a1,a2)   -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                None
-                              else
-                                 Some (z1.Value > z2.Value) 
-    | GreaterEqExp (a1,a2) -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                 None
-                              else
-                                 Some (z1.Value >= z2.Value)
-    | LessExp (a1,a2)      -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                 None
-                              else
-                                 Some (z1.Value < z2.Value)
-    | LessEqExp (a1,a2)    -> let z1 = execA mem a1
-                              let z2 = execA mem a2
-                              if (z1.IsNone || z2.IsNone) then
-                                None
-                              else
-                                 Some (z1.Value <= z2.Value)                            
-    | OrExp (b1,b2)        -> let ob1 = execB mem b1
-                              let ob2 = execB mem b2
-                              if (ob1.IsNone || ob2.IsNone) then
-                                None
-                              else
-                                 Some (ob1.Value || ob2.Value)
-    | ShortOrExp (b1,b2)   -> let ob1 = execB mem b1
-                              let ob2 = execB mem b2
-                              if (ob1.IsNone || ob2.IsNone) then
-                                None
-                              else
-                                 Some (ob1.Value || ob2.Value)                                                         
-    | AndExp (b1, b2)      -> let ob1 = execB mem b1
-                              let ob2 = execB mem b2
-                              if (ob1.IsNone || ob2.IsNone) then
-                                 None
-                              else
-                                 Some (ob1.Value && ob2.Value)
-    | ShortAndExp (b1, b2) -> let ob1 = execB mem b1
-                              let ob2 = execB mem b2
-                              if (ob1.IsNone || ob2.IsNone) then
-                                None
-                              else
-                                 Some (ob1.Value && ob2.Value)     
+    | EqExp (a1, a2)       -> applyOpA a1 a2 (=) mem
+    | NotEqExp (a1,a2)     -> applyOpA a1 a2 (<>) mem
+    | GreaterExp (a1,a2)   -> applyOpA a1 a2 (>) mem
+    | GreaterEqExp (a1,a2) -> applyOpA a1 a2 (>=) mem
+    | LessExp (a1,a2)      -> applyOpA a1 a2 (<) mem
+    | LessEqExp (a1,a2)    -> applyOpA a1 a2 (<=) mem                   
+    | OrExp (b1,b2)        -> applyOpB a1 a2 (||) mem
+    | ShortOrExp (b1,b2)   -> applyOpB a1 a2 (||) mem                                                       
+    | AndExp (b1, b2)      -> applyOpB a1 a2 (&&) mem
+    | ShortAndExp (b1, b2) -> applyOpB a1 a2 (&&) mem   
     | NotExp b1            -> Some (not(execB mem b1))                  
-
     | _                    -> None //keep or not
 
 // returns option memory (Map string and int)
@@ -137,11 +76,8 @@ let exec mem = function
                                                       | _                               -> None
                 | ArrayAssignment (var, ind, aexp) -> let z1 = execA mem ind
                                                       let z2 = execA mem aexp
-                                                      let b = mem.containsKey var 
-                                                      if z1.IsSome && z2.IsSome && b then
-                                                         let oldA = Map.find var mem 
-                                                         let newA = x.[0..ind-1]@[aexp]@ x.[ind+1..oldA.Length-1]
-                                                          Some (Map.add var newA mem)
+                                                      if z1.IsSome && z2.IsSome && (mem.containsKey varName) then
+                                                          Some (Map.add (sprintf "%s[%i]" var ind) aexp mem)
                                                       else 
                                                           None 
                 | _                                -> failwith "wrong input"
@@ -151,8 +87,8 @@ let exec mem = function
 let chooseBranch q mem edges = 
     Set.filter (fun (q1,exp,_) -> (q1 = q) && ((exec mem exp).IsSome) ) edges 
 
- let testExec =
-     printfn "%A" (execA (Map.ofList [("x",0);("y",3)]) (Plus (Var "y", Num 5) ) )
+let testExec =
+    printfn "%A" (execA (Map.ofList [("x",0);("y",3)]) (Plus (Var "y", Num 5) ) )
     // printfn "%A" (exec (Map.ofList [("x",0)]) (B (ShortAndExp (GreaterEqExp (Var "x", Num 0),NotExp (ShortOrExp (EqExp (Var "x", Num 0), ShortOrExp (LessEqExp (Var "x", Num 0), FExp))))))
 
 

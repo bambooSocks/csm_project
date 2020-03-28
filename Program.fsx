@@ -1,4 +1,4 @@
-#r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
+﻿#r "FsLexYacc.Runtime.10.0.0/lib/net46/FsLexYacc.Runtime.dll"
 open FSharp.Text.Lexing
 open System
 #load "GCLTypesAST.fs"
@@ -30,14 +30,13 @@ let ast = parse code
 let edges = edgesC (Node 0) EndNode Set.empty getDet ast
 let graphviz = generateGraphviz (Set.toList edges)
 let branch = chooseBranch (Node 0) (Map.ofList [("x",1);("y",2)]) edges
-
-testExec
+let testExec = execA (Map.ofList [("x",0);("y",3)]) (Plus (Var "y", Var "x") ) 
 
 try
     // printfn "%A" ast
-    printfn "%A" edges
+    printfn "%A" testExec
     // printfn "%A" graphviz
-    printfn "%A" branch
+    //printfn "%A" branch
 with
     err -> printfn "An error has occured"
            printfn "%A" err
