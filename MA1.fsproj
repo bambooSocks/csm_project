@@ -17,6 +17,7 @@
         <Compile Include="PGGenerator.fs" />
         <None Include="Program.fsx" />
         <Content Include="Makefile" />
+        <Compile Include="Interpreter.fs" />
     </ItemGroup>
 
 </Project>
