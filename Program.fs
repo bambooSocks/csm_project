@@ -7,7 +7,7 @@ open PGGenerator
 open GraphvizGenerator
 open Interpreter
 
-let code = System.IO.File.ReadAllText "./code.gc"
+let code = System.IO.File.ReadAllText "../../../code.gc"
 
 let parse input =
      // translate string into a buffer of characters
@@ -17,8 +17,7 @@ let parse input =
     // return the result of parsing (i.e. value of type "expr")
     res
     
- 
-
+    
 [<EntryPoint>]
 let main argv =
     let getDet = List.contains "-d" (Array.toList argv)  

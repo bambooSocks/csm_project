@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Content Include="code.gc" />
         <Content Include="GCLLexer.fsl" />
         <Content Include="GCLParser.fsp" />
         <Content Include="Makefile" />
