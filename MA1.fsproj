@@ -6,18 +6,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Program.fs" />
-        <Compile Include="GCLLexer.fs" />
         <Content Include="GCLLexer.fsl" />
-        <Compile Include="GCLParser.fs" />
-        <Compile Include="GCLParser.fsi" />
         <Content Include="GCLParser.fsp" />
-        <Compile Include="GCLTypesAST.fs" />
-        <Compile Include="GraphvizGenerator.fs" />
-        <Compile Include="PGGenerator.fs" />
-        <None Include="Program.fsx" />
         <Content Include="Makefile" />
+        <Compile Include="GCLTypesAST.fs" />
+        <Compile Include="GCLParser.fsi" />
+        <Compile Include="GCLParser.fs" />
+        <Compile Include="GCLLexer.fs" />
+        <Compile Include="PGGenerator.fs" />
+        <Compile Include="GraphvizGenerator.fs" />
         <Compile Include="Interpreter.fs" />
+        <None Include="Program.fsx" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="FsLexYacc.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>FsLexYacc.Runtime.10.0.0\lib\net46\FsLexYacc.Runtime.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

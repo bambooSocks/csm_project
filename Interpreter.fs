@@ -1,4 +1,5 @@
 module Interpreter
+open GCLTypesAST
 
 let rec applyOpA a1 a2 op mem = 
     let z1 = execA mem a1

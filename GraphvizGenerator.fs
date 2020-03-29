@@ -1,5 +1,6 @@
 module GraphvizGenerator
-
+open GCLTypesAST
+open PGGenerator
 let addParA s = function
     | Num _ | Var _ | UnaryMinus _ -> s
     | _                            -> sprintf "(%s)" s

@@ -1,5 +1,5 @@
 module PGGenerator
-
+open GCLTypesAST
 let mutable nodes = Set.empty //set of node numbers
 
 type NodeType = | EndNode

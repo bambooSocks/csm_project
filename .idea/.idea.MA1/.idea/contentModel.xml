@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$USER_HOME$/.Rider2019.2/system/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2019.2/system/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_MA1.438681649.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeRecursive">
+      <e p="GCLLexer.fs" t="Include" />
+      <e p="GCLLexer.fsl" t="Include" />
+      <e p="GCLParser.fs" t="Include" />
+      <e p="GCLParser.fsi" t="Include" />
+      <e p="GCLParser.fsp" t="Include" />
+      <e p="GCLTypesAST.fs" t="Include" />
+      <e p="GraphvizGenerator.fs" t="Include" />
+      <e p="Interpreter.fs" t="Include" />
+      <e p="MA1.fsproj" t="IncludeRecursive" />
+      <e p="MA1.sln" t="IncludeFlat" />
+      <e p="Makefile" t="Include" />
+      <e p="PGGenerator.fs" t="Include" />
+      <e p="Program.fs" t="Include" />
+      <e p="Program.fsx" t="Include" />
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>
