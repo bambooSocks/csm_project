@@ -1,67 +1,63 @@
 module Interpreter
 open GCLTypesAST
 
-let rec applyOpA a1 a2 op mem = 
-    let z1 = execA mem a1
-    let z2 = execA mem a2
-    if z1.IsSome && z2.IsSome then 
-       Some (op z1.Value z2.Value)
+// Apply Arithmetic Operator To Arithmetic expressions
+let rec ApplyArithOpToArith a1 a2 op mem : int option = 
+    let z1 = ExecuteA mem a1
+    let z2 = ExecuteA mem a2
+    if z1.IsSome && z2.IsSome then
+        Some (op z1.Value z2.Value)
     else 
-       None 
+        None
 
-
-// returns option int
-and execA mem aexp : int option =
+// Execute Arithmetic expression
+and ExecuteA mem aexp : int option =
     match aexp with
-    | Var v            -> if (Map.containsKey v mem) then
-                             Some (Map.find v mem)
-                          else
-                             None
-    | Num n            -> Some n
-    | Plus (a1,a2)     -> applyOpA a1 a2 (+) mem
-    | Minus (a1,a2)    -> applyOpA a1 a2 (-) mem
-    | Mul (a1,a2)      -> applyOpA a1 a2 ( * ) mem
-    | Div (a1,a2)      -> applyOpA a1 a2 (/) mem     
-    | Pow (a1,a2)      -> let z1 = execA mem a1
-                          let z2 = execA mem a2
-                          if z1.IsSome && z2.IsSome && (z2.Value >=0) then 
-                             Some (int(float(z1.Value) ** float(z2.Value)))
-                          else 
-                             None 
-    | UnaryMinus a1    -> let z1 = execA mem a1
-                          if z1.IsSome then
-                             Some (-(z1.Value))
-                          else 
-                             None
-    | Array (var, ind) -> let indVal = execA mem ind
-                          if indVal.IsSome then
-                              let varName = (sprintf "%s[%u]" var indVal.Value)
-                              if mem.ContainsKey varName then
-                                  Some (Map.find varName mem)  
-                              else
-                                  None
-                          else
-                              None
+    | Var v          -> Map.tryFind v mem
+    | Num n          -> Some n
+    | Add (a1, a2)   -> ApplyArithOpToArith a1 a2 ( + ) mem
+    | Sub (a1, a2)   -> ApplyArithOpToArith a1 a2 ( - ) mem
+    | Mul (a1, a2)   -> ApplyArithOpToArith a1 a2 ( * ) mem
+    | Div (a1, a2)   -> ApplyArithOpToArith a1 a2 ( / ) mem     
+    | Pow (a1, a2)   -> let z1 = ExecuteA mem a1
+                        let z2 = ExecuteA mem a2
+                        if z1.IsSome && z2.IsSome && (z2.Value >=0) then 
+                            Some (int(float(z1.Value) ** float(z2.Value)))
+                        else 
+                            None 
+    | Neg a1         -> let z1 = ExecuteA mem a1
+                        if z1.IsSome then
+                            Some (-(z1.Value))
+                        else 
+                            None
+    | Arr (var, ind) -> let indVal = ExecuteA mem ind
+                        if indVal.IsSome then
+                            Map.tryFind (sprintf "%s[%u]" var indVal.Value) mem
+                        else
+                            None
 
-  
-let rec applyOpB a1 a2 op mem : bool option = 
-               let z1 = execB mem a1
-               let z2 = execB mem a2
-               if (z1.IsSome && z2.IsSome) then
-                  Some ( op z1.Value z2.Value)
-               else 
-                  None  
-and applyOpAB a1 a2 op mem : bool option =
-    let z1 = execA mem a1
-    let z2 = execA mem a2
-    if z1.IsSome && z2.IsSome then 
-       Some (op z1.Value z2.Value)
-    else 
-       None  
+// Apply Boolean Operator To Arithmetic expressions
+let rec ApplyBoolOpToArith a1 a2 op mem : bool option =
+    let z1 = ExecuteA mem a1
+    let z2 = ExecuteA mem a2
+    if z1.IsSome && z2.IsSome then
+        Some (op z1.Value z2.Value)
+    else
+        None
 
-and applyS a1 a2 op mem :bool option = 
-    let z1 = execB mem a1
-    let z2 = execB mem a2
+// Apply Boolean Operator To Boolean expressions
+and ApplyBoolOpToBool a1 a2 op mem : bool option = 
+    let z1 = ExecuteB mem a1
+    let z2 = ExecuteB mem a2
+    if (z1.IsSome && z2.IsSome) then
+        Some ( op z1.Value z2.Value)
+    else
+        None
+
+// Apply Short-Circuit Boolean Operator To Boolean expressions
+and ApplySCBoolOpToBool a1 a2 op mem :bool option = 
+    let z1 = ExecuteB mem a1
+    let z2 = ExecuteB mem a2
     if z1.IsNone then None
     else
         if z1.IsSome && z2.IsSome then
@@ -69,54 +65,121 @@ and applyS a1 a2 op mem :bool option =
         else
             Some false 
 
-// returns option boolean
-and execB mem bexp : bool option =
+// Execute Boolean expression
+and ExecuteB mem bexp : bool option =
     match bexp with
-    | TExp                 -> Some true
-    | FExp                 -> Some false
-    | EqExp (a1, a2)       -> applyOpAB a1 a2 (=) mem
-    | NotEqExp (a1,a2)     -> applyOpAB a1 a2 (<>) mem
-    | GreaterExp (a1,a2)   -> applyOpAB a1 a2 (>) mem
-    | GreaterEqExp (a1,a2) -> applyOpAB a1 a2 (>=) mem
-    | LessExp (a1,a2)      -> applyOpAB a1 a2 (<) mem
-    | LessEqExp (a1,a2)    -> applyOpAB a1 a2 (<=) mem                   
-    | OrExp (b1,b2)        -> applyOpB b1 b2 (||) mem
-    | ShortOrExp (b1,b2)   -> applyS b1 b2 (||) mem                                                       
-    | AndExp (b1, b2)      -> applyOpB b1 b2 (&&) mem
-    | ShortAndExp (b1, b2) -> applyS b1 b2 (&&) mem   
-    | NotExp b1            -> let z = execB mem b1
-                              if z.IsSome then 
-                                 Some (not z.Value) 
-                              else 
-                                 None                 
+    | TExp           -> Some true
+    | FExp           -> Some false
+    | Eq (a1, a2)    -> ApplyBoolOpToArith a1 a2 (=) mem
+    | NEq (a1,a2)    -> ApplyBoolOpToArith a1 a2 (<>) mem
+    | Gr (a1,a2)     -> ApplyBoolOpToArith a1 a2 (>) mem
+    | GrEq (a1,a2)   -> ApplyBoolOpToArith a1 a2 (>=) mem
+    | Ls (a1,a2)     -> ApplyBoolOpToArith a1 a2 (<) mem
+    | LsEq (a1,a2)   -> ApplyBoolOpToArith a1 a2 (<=) mem
+    | Or (b1,b2)     -> ApplyBoolOpToBool b1 b2 (||) mem
+    | And (b1, b2)   -> ApplyBoolOpToBool b1 b2 (&&) mem
+    | SCOr (b1,b2)   -> ApplySCBoolOpToBool b1 b2 (||) mem
+    | SCAnd (b1, b2) -> ApplySCBoolOpToBool b1 b2 (&&) mem
+    | Not b1         -> let z = ExecuteB mem b1
+                        if z.IsSome then
+                            Some (not z.Value)
+                        else 
+                            None
 
-// returns option memory (Map string and int)
-let exec mem exp : Map<string, int> option=
+// Execute general expression
+let Execute mem exp : Memory option=
     match exp with
-    | B bexp -> match (execB mem bexp) with
+    | B bexp -> match (ExecuteB mem bexp) with
                 | Some true -> Some mem
                 | _         -> None
     | C cexp -> match cexp with
-                | SkipExp                          -> Some mem
-                | Assignment (var, aexp)           -> match (execA mem aexp) with
-                                                      | Some n when mem.ContainsKey var -> Some (Map.add var n mem)
-                                                      | _                               -> None
-                | ArrayAssignment (var, ind, aexp) -> let z1 = execA mem ind
-                                                      let z2 = execA mem aexp
-                                                      let varName = sprintf "%s[%i]" var z1.Value
-                                                      if z1.IsSome && z2.IsSome && (mem.ContainsKey varName) then
-                                                          Some (Map.add varName z2.Value mem)
-                                                      else 
-                                                          None 
-                | _                                -> failwith "wrong input"
+                | Skip                      -> Some mem
+                | Asgmt (var, aexp)         -> match (ExecuteA mem aexp) with
+                                                   | Some n -> Some (Map.add var n mem)
+                                                   | _      -> None
+                | ArrAsgmt (var, ind, aexp) -> match (ExecuteA mem ind), (ExecuteA mem aexp) with
+                                                   | Some z1 , Some z2 -> let varName = sprintf "%s[%i]" var z1
+                                                                          Some (Map.add varName z2 mem)
+                                                   | _                 -> None
+                | _                         -> failwith "wrong input"
     | _      -> failwith "wrong input"
-    
 
-let chooseBranch q mem edges = 
-    Set.filter (fun (q1,exp,_) -> (q1 = q) && ((exec mem exp).IsSome) ) edges 
+// Creates a set of all used variable names in the abstract syntax tree
+let rec CollectVariables exp output =
+    match exp with
+    | A aexp  -> match aexp with
+                     | Var v                -> Set.add v output
+                     | Arr (v, e)           -> CollectVariables (A e) (Set.add v output)
+                     | Num _                -> output
+                     | Neg e                -> CollectVariables (A e) output
+                     | Add (e1, e2)
+                     | Sub (e1, e2)
+                     | Mul (e1, e2)
+                     | Div (e1, e2)
+                     | Pow (e1, e2)         -> CollectVariables (A e1) output
+                                               |> CollectVariables (A e2)
+    | B bexp  -> match bexp with
+                     | TExp | FExp          -> output
+                     | Not e                -> CollectVariables (B e) output
+                     | And (e1, e2)
+                     | Or (e1, e2)
+                     | SCAnd (e1, e2)
+                     | SCOr (e1, e2)        -> CollectVariables (B e1) output
+                                               |> CollectVariables (B e2)
+                     | Eq (e1, e2)
+                     | NEq (e1, e2)
+                     | Gr (e1, e2)
+                     | GrEq (e1, e2)
+                     | Ls (e1, e2)
+                     | LsEq (e1, e2)        -> CollectVariables (A e1) output
+                                               |> CollectVariables (A e2)
+    | C cexp  -> match cexp with
+                     | Asgmt (v, e)         -> CollectVariables (A e) (Set.add v output)
+                     | ArrAsgmt (v, e1, e2) -> CollectVariables (A e1) (Set.add v output)
+                                               |> CollectVariables (A e2)
+                     | Skip                 -> output
+                     | CSeq (e1, e2)        -> CollectVariables (C e1) output
+                                               |> CollectVariables (C e2)
+                     | If gc | Do gc        -> CollectVariables (G gc) output
+    | G gcexp -> match gcexp with
+                     | GC (g, c)            -> CollectVariables (B g) output
+                                               |> CollectVariables (C c)
+                     | GCSeq (g1, g2)       -> CollectVariables (G g1) output
+                                               |> CollectVariables (G g2)
 
-let testExec =
-    printfn "%A" (execA (Map.ofList [("x",0);("y",3)]) (Plus (Var "y", Num 5) ) )
-    // printfn "%A" (exec (Map.ofList [("x",0)]) (B (ShortAndExp (GreaterEqExp (Var "x", Num 0),NotExp (ShortOrExp (EqExp (Var "x", Num 0), ShortOrExp (LessEqExp (Var "x", Num 0), FExp))))))
+// Ask for integer value of the given variable
+// TODO: make more robust
+let InputInitVar v =
+    printf "Please enter an initial value for %s: " v
+    int(System.Console.ReadLine())
+
+// Generate initial memory from all found variables
+// TODO: allow for array input
+let GetInitVars exp =
+    let vars = Set.toList (CollectVariables exp Set.empty)
+    let vals = List.map InputInitVar vars
+    Map.ofList (List.zip vars vals)
 
 
+// Run Program Graph defined by edges and given a current node q and memory mem
+let rec RunPG q (edges: Set<Edge>) (mem: Memory) =
+        let edgesList = Set.toList (Set.filter (fun (q1,exp,_) -> (q1 = q) && ((Execute mem exp).IsSome) ) edges)
+        match edgesList with
+        | []               -> match q with
+                                  | EndNode -> Terminated mem
+                                  | _       -> Stuck (q, mem)
+        | (_, exp, q2)::_  -> (Execute mem exp).Value
+                              |> RunPG q2 edges
+
+// Prints the contents of memory
+let PrintMemory m =
+    Map.map (fun k v -> printfn "%s: %u" k v) m |> ignore
+
+// Prints the given state
+let PrintState = function
+    | Terminated m -> printfn "Status: terminated"
+                      printfn "Node: %s" (toStringN EndNode)
+                      PrintMemory m
+    | Stuck (n, m) -> printfn "Status: stuck"
+                      printfn "Node: %s" (toStringN n)
+                      PrintMemory m

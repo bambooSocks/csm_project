@@ -7,7 +7,7 @@ open PGGenerator
 open GraphvizGenerator
 open Interpreter
 
-let code = System.IO.File.ReadAllText "../../../code.gc"
+let code = IO.File.ReadAllText "../../../code.gc"
 
 let parse input =
      // translate string into a buffer of characters
@@ -20,21 +20,17 @@ let parse input =
     
 [<EntryPoint>]
 let main argv =
-    let getDet = List.contains "-d" (Array.toList argv)  
-    let ast = parse code
-    let edges = edgesC (Node 0) EndNode Set.empty getDet ast
-    let graphviz = generateGraphviz (Set.toList edges)
-    let branch = chooseBranch (Node 0) (Map.ofList [("x",1);("y",2)]) edges
-    let testExec = execB (Map.ofList [("x",0);("y",3)]) (NotExp (LessExp(Num 1, Num 2)) )
-    
+    let isDet = List.contains "-d" (Array.toList argv)
+
     try
-        // printfn "%A" ast
-        printfn "%A" testExec
-        // printfn "%A" graphviz
-        //printfn "%A" branch
+        let ast = parse code
+        let edges = EdgesC (Node 0) EndNode Set.empty isDet ast
+//        let graphviz = generateGraphviz (Set.toList edges)
+        let state = GetInitVars (C ast)
+                    |> RunPG (Node 0) edges
+        PrintState state
     with
         err -> printfn "An error has occured"
                printfn "%A" err
-    
-    //return
-    0
+
+    0 //return

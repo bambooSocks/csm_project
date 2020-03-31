@@ -1,48 +1,71 @@
 module GCLTypesAST
 
+// Arithmetic expressions
 type AExp = 
       | Num of int 
       | Var of string
-      | Array of (string*AExp)
-      | Plus of (AExp*AExp) 
-      | Minus of (AExp*AExp)
+      | Arr of (string*AExp)
+      | Add of (AExp*AExp) 
+      | Sub of (AExp*AExp)
       | Mul of (AExp*AExp)
       | Div of (AExp*AExp)
-      | UnaryMinus of AExp
+      | Neg of AExp
       | Pow of (AExp*AExp)
 
+// Boolean expressions
 type BExp =
       | TExp
       | FExp
-      | AndExp of (BExp*BExp)
-      | OrExp of (BExp*BExp)
-      | ShortAndExp of (BExp*BExp)
-      | ShortOrExp of (BExp*BExp)
-      | NotExp of BExp
-      | EqExp of (AExp*AExp)
-      | NotEqExp of (AExp*AExp)
-      | GreaterExp of (AExp*AExp)
-      | GreaterEqExp of (AExp*AExp)
-      | LessExp of (AExp*AExp)
-      | LessEqExp of (AExp*AExp)
+      | And of (BExp*BExp)
+      | Or of (BExp*BExp)
+      | SCAnd of (BExp*BExp)  // short-circuit and
+      | SCOr of (BExp*BExp)   // short-circuit or
+      | Not of BExp
+      | Eq of (AExp*AExp)
+      | NEq of (AExp*AExp)
+      | Gr of (AExp*AExp)
+      | GrEq of (AExp*AExp)
+      | Ls of (AExp*AExp)
+      | LsEq of (AExp*AExp)
 
+// Command expression
 type CExp = 
-      | Assignment of (string*AExp)
-      | ArrayAssignment of (string*AExp*AExp)
-      | SkipExp
-      | CExpSeq of (CExp*CExp)
-      | IfExp of GCExp
-      | DoExp of GCExp
+      | Asgmt of (string*AExp)
+      | ArrAsgmt of (string*AExp*AExp)
+      | Skip
+      | CSeq of (CExp*CExp)
+      | If of GCExp
+      | Do of GCExp
 
+// Guarded command expression
 and GCExp = 
       | GC of (BExp*CExp)
       | GCSeq of (GCExp*GCExp)
         
-
+// General expression
 type Exp =
     | A of AExp
     | B of BExp
     | C of CExp
     | G of GCExp
    
+// Node type
+type NodeType =
+    | EndNode
+    | Node of int
 
+// Edge
+type Edge = NodeType * Exp * NodeType
+
+// Memory
+type Memory = Map<string, int>
+
+// State of the program after execution
+type ProgramState = 
+    | Stuck      of NodeType * Memory
+    | Terminated of Memory
+
+let toStringN = function
+    | Node 0    -> "q▷"
+    | EndNode   -> "q◀"
+    | Node n    ->  sprintf "q%d" n

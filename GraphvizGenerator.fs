@@ -1,8 +1,8 @@
 module GraphvizGenerator
 open GCLTypesAST
-open PGGenerator
+
 let addParA s = function
-    | Num _ | Var _ | UnaryMinus _ -> s
+    | Num _ | Var _ | Neg _ -> s
     | _                            -> sprintf "(%s)" s
 
 let rec toStringA addPar aexp =
@@ -12,16 +12,16 @@ let rec toStringA addPar aexp =
         match aexp with
             | Num n            -> sprintf "%i" n
             | Var v            -> v
-            | Array (v, ind)   -> sprintf "%s[%s]"  v (toStringA true ind)
-            | Plus (ex1, ex2)  -> sprintf "%s + %s" (toStringA true ex1) (toStringA true ex2)
-            | Minus (ex1, ex2) -> sprintf "%s - %s" (toStringA true ex1) (toStringA true ex2)
+            | Arr (v, ind)   -> sprintf "%s[%s]"  v (toStringA true ind)
+            | Add (ex1, ex2)  -> sprintf "%s + %s" (toStringA true ex1) (toStringA true ex2)
+            | Sub (ex1, ex2) -> sprintf "%s - %s" (toStringA true ex1) (toStringA true ex2)
             | Mul (ex1, ex2)   -> sprintf "%s * %s" (toStringA true ex1) (toStringA true ex2)
             | Div (ex1, ex2)   -> sprintf "%s / %s" (toStringA true ex1) (toStringA true ex2)
-            | UnaryMinus n     -> sprintf "-%s"     (toStringA true n)
+            | Neg n     -> sprintf "-%s"     (toStringA true n)
             | Pow (ex1, ex2)   -> sprintf "%s ^ %s" (toStringA true ex1) (toStringA true ex2)
 
 let addParB s = function
-    | TExp | FExp | NotExp _ -> s
+    | TExp | FExp | Not _ -> s
     | _                      -> sprintf "(%s)" s
 
 let rec toStringB addPar bexp = 
@@ -31,22 +31,22 @@ let rec toStringB addPar bexp =
         match bexp with
             | TExp                    -> "true"
             | FExp                    -> "false"
-            | AndExp (ex1, ex2)       -> sprintf "%s & %s"  (toStringB true ex1) (toStringB true ex2)
-            | OrExp (ex1, ex2)        -> sprintf "%s | %s"  (toStringB true ex1) (toStringB true ex2)
-            | ShortAndExp (ex1, ex2)  -> sprintf "%s && %s" (toStringB true ex1) (toStringB true ex2)
-            | ShortOrExp (ex1, ex2)   -> sprintf "%s || %s" (toStringB true ex1) (toStringB true ex2)
-            | NotExp ex               -> sprintf "!%s"      (toStringB true ex)
-            | EqExp (ex1, ex2)        -> sprintf "%s = %s"  (toStringA true ex1) (toStringA true ex2)
-            | NotEqExp (ex1, ex2)     -> sprintf "%s != %s" (toStringA true ex1) (toStringA true ex2)
-            | GreaterExp (ex1, ex2)   -> sprintf "%s > %s"  (toStringA true ex1) (toStringA true ex2)
-            | GreaterEqExp (ex1, ex2) -> sprintf "%s >= %s" (toStringA true ex1) (toStringA true ex2)
-            | LessExp (ex1, ex2)      -> sprintf "%s < %s"  (toStringA true ex1) (toStringA true ex2)
-            | LessEqExp (ex1, ex2)    -> sprintf "%s <= %s" (toStringA true ex1) (toStringA true ex2)
+            | And (ex1, ex2)       -> sprintf "%s & %s"  (toStringB true ex1) (toStringB true ex2)
+            | Or (ex1, ex2)        -> sprintf "%s | %s"  (toStringB true ex1) (toStringB true ex2)
+            | SCAnd (ex1, ex2)  -> sprintf "%s && %s" (toStringB true ex1) (toStringB true ex2)
+            | SCOr (ex1, ex2)   -> sprintf "%s || %s" (toStringB true ex1) (toStringB true ex2)
+            | Not ex               -> sprintf "!%s"      (toStringB true ex)
+            | Eq (ex1, ex2)        -> sprintf "%s = %s"  (toStringA true ex1) (toStringA true ex2)
+            | NEq (ex1, ex2)     -> sprintf "%s != %s" (toStringA true ex1) (toStringA true ex2)
+            | Gr (ex1, ex2)   -> sprintf "%s > %s"  (toStringA true ex1) (toStringA true ex2)
+            | GrEq (ex1, ex2) -> sprintf "%s >= %s" (toStringA true ex1) (toStringA true ex2)
+            | Ls (ex1, ex2)      -> sprintf "%s < %s"  (toStringA true ex1) (toStringA true ex2)
+            | LsEq (ex1, ex2)    -> sprintf "%s <= %s" (toStringA true ex1) (toStringA true ex2)
 
 let rec toStringC = function
-    | Assignment (var, aexp)           -> sprintf "%s := %s"     var (toStringA false aexp)
-    | ArrayAssignment (var, ind, aexp) -> sprintf "%s[%s] := %s" var (toStringA false ind) (toStringA false aexp)
-    | SkipExp                          -> "skip"
+    | Asgmt (var, aexp)           -> sprintf "%s := %s"     var (toStringA false aexp)
+    | ArrAsgmt (var, ind, aexp) -> sprintf "%s[%s] := %s" var (toStringA false ind) (toStringA false aexp)
+    | Skip                          -> "skip"
     | _                                -> failwith "wrong input"
 
 let toString = function
@@ -54,11 +54,6 @@ let toString = function
     | B bexp -> toStringB false bexp
     | C cexp -> toStringC cexp
     | _      -> failwith "wrong input"
-
-let toStringN = function
-    | Node 0    -> "q▷"
-    | EndNode   -> "q◀"
-    | Node n    ->  sprintf "q%d" n
 
 let rec generateGraphviz_aux s = function
     | []                -> sprintf "%s\n}" s
