@@ -65,7 +65,8 @@ type ProgramState =
     | Stuck      of NodeType * Memory
     | Terminated of Memory
 
-let toStringN = function
+// Converts a Node to string
+let ToStringNode = function
     | Node 0    -> "q▷"
     | EndNode   -> "q◀"
     | Node n    ->  sprintf "q%d" n
