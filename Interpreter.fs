@@ -178,8 +178,8 @@ let PrintMemory m =
 // Prints the given state
 let PrintState = function
     | Terminated m -> printfn "Status: terminated"
-                      printfn "Node: %s" (toStringN EndNode)
+                      printfn "Node: q◀"
                       PrintMemory m
     | Stuck (n, m) -> printfn "Status: stuck"
-                      printfn "Node: %s" (toStringN n)
+                      printfn "Node: %s" (ToStringNode n)
                       PrintMemory m
