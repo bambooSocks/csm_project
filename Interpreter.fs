@@ -96,11 +96,14 @@ let Execute mem exp : Memory option=
     | C cexp -> match cexp with
                 | Skip                      -> Some mem
                 | Asgmt (var, aexp)         -> match (ExecuteA mem aexp) with
-                                                   | Some n -> Some (Map.add var n mem)
-                                                   | _      -> None
+                                                   | Some n when mem.ContainsKey var -> Some (Map.add var n mem)
+                                                   | _                               -> None
                 | ArrAsgmt (var, ind, aexp) -> match (ExecuteA mem ind), (ExecuteA mem aexp) with
                                                    | Some z1 , Some z2 -> let varName = sprintf "%s[%i]" var z1
-                                                                          Some (Map.add varName z2 mem)
+                                                                          if mem.ContainsKey varName then
+                                                                              Some (Map.add varName z2 mem)
+                                                                          else
+                                                                              None
                                                    | _                 -> None
                 | _                         -> failwith "wrong input"
     | _      -> failwith "wrong input"
