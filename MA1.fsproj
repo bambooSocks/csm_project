@@ -19,6 +19,7 @@
         <Compile Include="Interpreter.fs" />
         <None Include="Program.fsx" />
         <Compile Include="Program.fs" />
+        <Content Include="README.md" />
     </ItemGroup>
 
     <ItemGroup>

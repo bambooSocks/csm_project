@@ -1,4 +1,5 @@
 module Interpreter
+open System.Text.RegularExpressions
 open GCLTypesAST
 
 // Apply Arithmetic Operator To Arithmetic expressions
@@ -147,18 +148,40 @@ let rec CollectVariables exp output =
                      | GCSeq (g1, g2)       -> CollectVariables (G g1) output
                                                |> CollectVariables (G g2)
 
-// Ask for integer value of the given variable
-// TODO: make more robust
-let InputInitVar v =
+// Regex pattern match
+// Modified from
+// source: https://stackoverflow.com/questions/5684014/f-mapping-regular-expression-matches-with-active-patterns
+let (|RegexMatch|_|) pattern input =
+    if input = null then None
+    else
+        let m = Regex.Match(input, pattern)
+        if m.Success then Some m
+        else None
+
+
+// Ask for integer or array value of the given variable
+let rec InputInitVar v : (string * int) list =
     printf "Please enter an initial value for %s: " v
-    int(System.Console.ReadLine())
+    match System.Console.ReadLine() with
+    | RegexMatch "^(\[ *([0-9] *)+\])$" m -> let s = m.Value
+                                                     |> fun str -> str.Replace ('[',' ')
+                                                     |> fun str -> str.Replace (']',' ')
+                                                     |> fun str -> str.Trim ()
+                                                     |> fun str -> str.Split ' '
+                                                     |> Array.toList
+                                                     |> List.map (fun str -> int(str))
+                                             let a = [0 .. (s.Length - 1)]
+                                                     |> List.map (fun i -> sprintf "%s[%i]" v i)
+                                             List.zip a s
+    | RegexMatch "^[0-9]+$" m             -> [(v, int(m.Value))]
+    | _                                   -> printfn "Wrong input! Enter either a number e.g. 1 or an array [ 1 2 3 ]"
+                                             InputInitVar v
 
 // Generate initial memory from all found variables
-// TODO: allow for array input
 let GetInitVars exp =
-    let vars = Set.toList (CollectVariables exp Set.empty)
-    let vals = List.map InputInitVar vars
-    Map.ofList (List.zip vars vals)
+    Set.toList (CollectVariables exp Set.empty)
+    |> List.collect InputInitVar
+    |> Map.ofList
 
 
 // Run Program Graph defined by edges and given a current node q and memory mem
@@ -173,7 +196,7 @@ let rec RunPG q (edges: Set<Edge>) (mem: Memory) =
 
 // Prints the contents of memory
 let PrintMemory m =
-    Map.map (fun k v -> printfn "%s: %u" k v) m |> ignore
+    Map.map (fun k v -> printfn "%s: %i" k v) m |> ignore
 
 // Prints the given state
 let PrintState = function

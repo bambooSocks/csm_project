@@ -20,15 +20,20 @@ let parse input =
     
 [<EntryPoint>]
 let main argv =
-    let isDet = List.contains "-d" (Array.toList argv)
+    let argList = Array.toList argv
+    let isDet = List.contains "-d" argList 
+    let showGraph = List.contains "--pg" argList
 
     try
         let ast = parse code
         let edges = EdgesC (Node 0) EndNode Set.empty isDet ast
-//        let graphviz = generateGraphviz (Set.toList edges)
-        let state = GetInitVars (C ast)
-                    |> RunPG (Node 0) edges
-        PrintState state
+        if showGraph then
+            let graphviz = GenerateGraphviz edges
+            printf "%A" graphviz
+        else
+            let state = GetInitVars (C ast)
+                        |> RunPG (Node 0) edges
+            PrintState state
     with
         err -> printfn "An error has occured"
                printfn "%A" err
