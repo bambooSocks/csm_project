@@ -166,22 +166,22 @@ let (|RegexMatch|_|) pattern input =
 let rec InputInitVar v : (string * int) list =
     printf "Please enter an initial value for %s: " v
     match System.Console.ReadLine() with
-    | RegexMatch "^(\[ *([0-9] *)+\])$" m -> let s = m.Value
-                                                     |> fun str -> str.Replace ('[',' ')
-                                                     |> fun str -> str.Replace (']',' ')
-                                                     |> fun str -> str.Trim ()
-                                                     |> fun str -> str.Split ' '
-                                                     |> Array.toList
-                                                     |> List.map (fun str -> int(str))
-                                             let a = [0 .. (s.Length - 1)]
-                                                     |> List.map (fun i -> sprintf "%s[%i]" v i)
-                                             List.zip a s
-    | RegexMatch "^[0-9]+$" m             -> [(v, int(m.Value))]
-    | _                                   -> printfn "Wrong input! Enter either a number e.g. 1 or an array [ 1 2 3 ]"
-                                             InputInitVar v
+    | RegexMatch "^( *\[ *([0-9]+ *)+\] *)$" m -> let s = m.Value
+                                                          |> fun str -> str.Replace ('[',' ')
+                                                          |> fun str -> str.Replace (']',' ')
+                                                          |> fun str -> str.Trim ()
+                                                          |> fun str -> str.Split ' '
+                                                          |> Array.toList
+                                                          |> List.map (fun str -> int(str))
+                                                  let a = [0 .. (s.Length - 1)]
+                                                          |> List.map (fun i -> sprintf "%s[%i]" v i)
+                                                  List.zip a s
+    | RegexMatch "^[0-9]+$" m                  -> [(v, int(m.Value))]
+    | _                                        -> printfn "Wrong input! Enter either a number e.g. 1 or an array [ 1 2 3 ]"
+                                                  InputInitVar v
 
 // Generate initial memory from all found variables
-let GetInitVars exp =
+let GetInitVars exp : Memory =
     Set.toList (CollectVariables exp Set.empty)
     |> List.collect InputInitVar
     |> Map.ofList
