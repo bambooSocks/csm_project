@@ -29,14 +29,14 @@ endif
 generate:
 ifeq ($(OS), Windows_NT)
 	FsLexYacc.10.0.0/build/fslex/net46/fslex.exe GCLLexer.fsl --unicode
-	@echo "\n\e[32mDONE 1 of 2\e[0m\n"
+	@echo -e "\n\e[32mDONE 1 of 2\e[0m\n"
 	FsLexYacc.10.0.0/build/fsyacc/net46/fsyacc.exe GCLParser.fsp --module GCLParser
-	@echo "\n\e[32mDONE 2 of 2\e[0m\n"
+	@echo -e "\n\e[32mDONE 2 of 2\e[0m\n"
 else
 	mono FsLexYacc.10.0.0/build/fslex/net46/fslex.exe GCLLexer.fsl --unicode
-	@echo "\n\e[32mDONE 1 of 2\e[0m\n"
+	@echo -e "\n\e[32mDONE 1 of 2\e[0m\n"
 	mono FsLexYacc.10.0.0/build/fsyacc/net46/fsyacc.exe GCLParser.fsp --module GCLParser
-	@echo "\n\e[32mDONE 2 of 2\e[0m\n"
+	@echo -e "\n\e[32mDONE 2 of 2\e[0m\n"
 endif
 
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="$USER_HOME$/.Rider2019.2/system/extResources" t="IncludeRecursive" />
-    <e p="$USER_HOME$/.Rider2019.2/system/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_MA1.438681649.00" t="ExcludeRecursive" />
     <e p="$PROJECT_DIR$" t="IncludeRecursive">
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="code.gc" t="Include" />
       <e p="GCLLexer.fs" t="Include" />
       <e p="GCLLexer.fsl" t="Include" />
       <e p="GCLParser.fs" t="Include" />
@@ -15,14 +15,15 @@
       <e p="MA1.fsproj" t="IncludeRecursive" />
       <e p="MA1.sln" t="IncludeFlat" />
       <e p="Makefile" t="Include" />
-      <e p="PGGenerator.fs" t="Include" />
-      <e p="Program.fs" t="Include" />
-      <e p="Program.fsx" t="Include" />
-      <e p="README.md" t="Include" />
-      <e p="bin" t="ExcludeRecursive" />
-      <e p="code.gc" t="Include" />
       <e p="obj" t="ExcludeRecursive" />
       <e p="packages" t="ExcludeRecursive" />
+      <e p="PGGenerator.fs" t="Include" />
+      <e p="Program.fs" t="Include" />
+      <e p="README.md" t="Include" />
+      <e p="SignAnalyser.fs" t="Include" />
+      <e p="Signs.fs" t="Include" />
     </e>
+    <e p="$USER_HOME$/Library/Caches/Rider2019.3/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2019.3/resharper-host/local/Transient/ReSharperHost/v193/SolutionCaches/_MA1.-379235294.00" t="ExcludeRecursive" />
   </component>
 </project>

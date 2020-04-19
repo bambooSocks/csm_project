@@ -56,15 +56,13 @@ and ApplyBoolOpToBool a1 a2 op mem : bool option =
         None
 
 // Apply Short-Circuit Boolean Operator To Boolean expressions
-and ApplySCBoolOpToBool a1 a2 op mem :bool option = 
-    let z1 = ExecuteB mem a1
-    let z2 = ExecuteB mem a2
-    if z1.IsNone then None
-    else
-        if z1.IsSome && z2.IsSome then
-            Some (op z1.Value z2.Value)
-        else
-            Some false 
+// b - condition the first expresion needs to be in order to check the second one
+and ApplySCBoolOpToBool a1 a2 b mem :bool option =
+    match ExecuteB mem a1 with
+    | Some v -> if v = b then
+                   ExecuteB mem a2
+                else Some (not b)
+    | None   -> None
 
 // Execute Boolean expression
 and ExecuteB mem bexp : bool option =
@@ -79,8 +77,8 @@ and ExecuteB mem bexp : bool option =
     | LsEq (a1,a2)   -> ApplyBoolOpToArith a1 a2 (<=) mem
     | Or (b1,b2)     -> ApplyBoolOpToBool b1 b2 (||) mem
     | And (b1, b2)   -> ApplyBoolOpToBool b1 b2 (&&) mem
-    | SCOr (b1,b2)   -> ApplySCBoolOpToBool b1 b2 (||) mem
-    | SCAnd (b1, b2) -> ApplySCBoolOpToBool b1 b2 (&&) mem
+    | SCOr (b1,b2)   -> ApplySCBoolOpToBool b1 b2 false mem
+    | SCAnd (b1, b2) -> ApplySCBoolOpToBool b1 b2 true mem
     | Not b1         -> let z = ExecuteB mem b1
                         if z.IsSome then
                             Some (not z.Value)

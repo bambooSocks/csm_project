@@ -70,3 +70,14 @@ let ToStringNode = function
     | Node 0    -> "q▷"
     | EndNode   -> "q◀"
     | Node n    ->  sprintf "q%d" n
+
+type Sign = | Plus
+            | Minus
+            | Zero
+
+type BoolSign = | TrueSign
+                | FalseSign
+
+type AbstractVariableMemory = Map<string, Sign>
+
+type AbstractArrayMemory = Map<string, Set<Sign>>
