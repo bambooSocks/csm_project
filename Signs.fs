@@ -48,7 +48,7 @@ let PowSigns = function
     | (Minus, Zero) -> set [ Plus ]
     | (Zero, Plus) -> set [ Zero ]
     | (Minus, Plus) -> set [ Minus ]
-    | (Zero, Zero) -> failwith "Undefined behaviour: Zero to the power of zero"
+    | (Zero, Zero) -> failwith "Undefined behaviour: Zero to the power of zero" // investigate
     | (Zero, Minus)
     | (Minus, Minus)
     | (Plus, Minus) -> failwith "Undefined behaviour: Exponent cannot be negative"
@@ -59,15 +59,15 @@ let NegSigns = function
     | Zero -> set [ Zero ]
 
 let EqSigns = function
-    | (Plus, Plus)
-    | (Minus, Minus)
     | (Zero, Zero) -> set [ TrueSign ]
+    | (Plus, Plus)
+    | (Minus, Minus) -> set [ TrueSign; FalseSign ]
     | _ -> set [ FalseSign ]
 
 let NeqSigns = function
-    | (Plus, Plus)
-    | (Minus, Minus)
     | (Zero, Zero) -> set [ FalseSign ]
+    | (Plus, Plus)
+    | (Minus, Minus) -> set [ TrueSign; FalseSign ]
     | _ -> set [ TrueSign ]
 
 let GrSigns = function
