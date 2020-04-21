@@ -47,7 +47,7 @@ let PowSigns = function
     | (Plus, Zero)
     | (Minus, Zero) -> set [ Plus ]
     | (Zero, Plus) -> set [ Zero ]
-    | (Minus, Plus) -> set [ Minus ]
+    | (Minus, Plus) -> set [ Minus;Plus ] //investigate
     | (Zero, Zero) -> failwith "Undefined behaviour: Zero to the power of zero" // investigate
     | (Zero, Minus)
     | (Minus, Minus)
@@ -71,30 +71,54 @@ let NeqSigns = function
     | _ -> set [ TrueSign ]
 
 let GrSigns = function
-    | _ -> failwith "missing implementation of GrSigns"
+    | (Zero,Zero) 
+    | (Minus,Zero)
+    | (Minus,Plus) -> set [FalseSign]
+    | (Minus,Minus)
+    | (Plus,Plus) -> set [FalseSign;TrueSign]
+    | _ -> set [ TrueSign ]
 
 let GrEqSigns = function
-    | _ -> failwith "missing implementation of GrEqSigns"
+    | (Minus,Minus)
+    | (Plus,Plus) -> set [TrueSign;FalseSign]
+    | (Minus,Plus)
+    | (Minus,Zero)
+    | (Zero,Plus) -> set [FalseSign]
+    | _ -> set [TrueSign]
 
-let LsSigns = function
-    | _ -> failwith "missing implementation of LsSigns"
+let LsSigns  = function
+    | (Minus,Zero)
+    | (Minus,Plus) -> set [TrueSign]
+    | (Minus,Minus)
+    | (Plus,Plus) -> set [FalseSign;TrueSign]
+    | _ -> set [FalseSign]
 
 let LsEqSigns = function
-    | _ -> failwith "missing implementation of LsEqSigns"
+    | (Minus,Minus)
+    | (Plus,Plus) -> set [TrueSign;FalseSign]
+    | (Minus,Plus)
+    | (Minus,Zero)
+    | (Zero,Plus) -> set [TrueSign]
+    | _ -> set [FalseSign]
 
 let OrSigns = function
-    | _ -> failwith "missing implementation of OrSigns"
+    | (FalseSign,FalseSign) -> set [FalseSign]
+    | _ -> set [TrueSign]
 
 let AndSigns = function
     | (TrueSign, TrueSign) -> set [ TrueSign ]
     | _ -> set [ FalseSign ]
 
 let SCOrSigns = function
-    | _ -> failwith "missing implementation of SCOrSigns"
-
+    | (TrueSign,_) -> set [TrueSign]
+    | (FalseSign,FalseSign) -> set [FalseSign]
+    | _ -> set [TrueSign]
+    
 let SCAndSigns = function
-    | _ -> failwith "missing implementation of SCAndSigns"
-
+    | (FalseSign,_) -> set [FalseSign]
+    | (TrueSign,TrueSign) -> set [TrueSign]
+    | _ -> set [FalseSign]
 let NotSigns = function
     | TrueSign -> set [ FalseSign ]
     | FalseSign -> set [ TrueSign ]
+    
