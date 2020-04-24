@@ -170,7 +170,7 @@ let rec InputInitVar v : (string * int) list =
                                                             |> fun str -> str.Trim ()
                                                             |> fun str -> str.Split ' '
                                                             |> Array.toList
-                                                            |> List.map (fun str -> int(str))
+                                                            |> List.map int
                                                     let a = [0 .. (s.Length - 1)]
                                                             |> List.map (fun i -> sprintf "%s[%i]" v i)
                                                     List.zip a s
@@ -187,7 +187,8 @@ let GetInitVars exp : Memory =
 
 // Run Program Graph defined by edges and given a current node q and memory mem
 let rec RunPG q (edges: Set<Edge>) (mem: Memory) =
-        let edgesList = Set.toList (Set.filter (fun (q1,exp,_) -> (q1 = q) && ((Execute mem exp).IsSome) ) edges)
+        let edgesList = Set.filter (fun (q1,exp,_) -> (q1 = q) && ((Execute mem exp).IsSome) ) edges
+                        |> Set.toList
         match edgesList with
         | []               -> match q with
                                   | EndNode -> Terminated mem
@@ -197,7 +198,7 @@ let rec RunPG q (edges: Set<Edge>) (mem: Memory) =
 
 // Prints the contents of memory
 let PrintMemory m =
-    Map.map (fun k v -> printfn "%s: %i" k v) m |> ignore
+    Map.iter (fun k v -> printfn "%s: %i" k v) m
 
 // Prints the given state
 let PrintState = function

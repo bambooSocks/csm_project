@@ -81,3 +81,5 @@ type BoolSign = | TrueSign
 type AbstractVariableMemory = Map<string, Sign>
 
 type AbstractArrayMemory = Map<string, Set<Sign>>
+
+type AbstractMemory = AbstractVariableMemory*AbstractArrayMemory

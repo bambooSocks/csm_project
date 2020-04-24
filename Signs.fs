@@ -1,4 +1,4 @@
-module MA1.Signs
+module Signs
 
 open GCLTypesAST
 
@@ -40,7 +40,8 @@ let DivSigns = function
     | (Minus, Plus) -> set [ Minus ]
     | (Plus, Zero)
     | (Zero, Zero)
-    | (Minus, Zero) -> failwith "Undefined behaviour: Division by zero"
+    | (Minus, Zero) -> eprintf "Undefined behaviour: Division by zero"
+                       Set.empty
 
 let PowSigns = function
     | (Plus, Plus)
@@ -48,10 +49,12 @@ let PowSigns = function
     | (Minus, Zero) -> set [ Plus ]
     | (Zero, Plus) -> set [ Zero ]
     | (Minus, Plus) -> set [ Minus;Plus ] //investigate
-    | (Zero, Zero) -> failwith "Undefined behaviour: Zero to the power of zero" // investigate
+    | (Zero, Zero) -> eprintf "Undefined behaviour: Zero to the power of zero" // investigate
+                      Set.empty
     | (Zero, Minus)
     | (Minus, Minus)
-    | (Plus, Minus) -> failwith "Undefined behaviour: Exponent cannot be negative"
+    | (Plus, Minus) -> eprintf "Undefined behaviour: Exponent cannot be negative"
+                       Set.empty
 
 let NegSigns = function
     | Plus -> set [ Minus ]
