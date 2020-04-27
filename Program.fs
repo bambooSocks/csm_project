@@ -6,7 +6,8 @@ open GCLLexer
 open PGGenerator
 open GraphvizGenerator
 open Interpreter
-open SignAnalyser
+open Signs
+open SignAnalyzer
 
 let code = IO.File.ReadAllText "../../../code.gc"
 
