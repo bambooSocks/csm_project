@@ -1,4 +1,5 @@
 module SignAnalyser
+open System.ComponentModel.Design
 open GCLTypesAST
 open System.Text.RegularExpressions
 open Signs
@@ -69,9 +70,10 @@ and SignAnalyseB (m1: AbstractVariableMemory, m2: AbstractArrayMemory) bexp: Set
         | Not b          -> let s = SignAnalyseB (m1, m2) b
                             Set.foldBack (fun y acc -> Set.union acc (NotSigns y)) s Set.empty
                                
-let SignAnalyse (mem:AbstractMemory list) exp =
+let SignAnalyse (mem:Set<AbstractMemory>) exp =
     match exp with
-    | B bexp -> List.collect (fun m -> if Set.contains TrueSign (SignAnalyseB m bexp) then [m] else []) mem
+    | B bexp -> List.collect (fun m -> if Set.contains TrueSign (SignAnalyseB m bexp) then [m] else []) (Set.toList mem)
+                |> Set.ofList
     | C cexp -> match cexp with
                 | Skip                      -> mem
                 | Asgmt (var, aexp)         -> let analyse (m1, m2) =
@@ -83,7 +85,10 @@ let SignAnalyse (mem:AbstractMemory list) exp =
                                                    SignAnalyseA (m1, m2) aexp
                                                    |> Set.toList
                                                    |> List.collect signToMem
-                                               List.collect analyse mem
+                                                   |> Set.ofList
+                                                   |> Set.toList
+                                               List.collect analyse (Set.toList mem)
+                                               |> Set.ofList
                 | ArrAsgmt (var, ind, aexp) -> let analyse (m1, m2) =
                                                    let indSigns = SignAnalyseA (m1, m2) ind
                                                    if not ((Set.contains Plus indSigns) || (Set.contains Zero indSigns)) then
@@ -95,7 +100,8 @@ let SignAnalyse (mem:AbstractMemory list) exp =
                                                            [(m1, (Map.add var (Set.union old s) m2))]
                                                        else
                                                            []
-                                               List.collect analyse mem
+                                               List.collect analyse (Set.toList mem)
+                                               |> Set.ofList
                 | _                         -> failwith "wrong input"
     | _      -> failwith "wrong input"
     
@@ -186,7 +192,7 @@ let rec InputInitSignArr a : (string * Set<Sign>) list =
          InputInitSignArr a
         
 // Generate initial memory from all found variables
-let GetInitSignVarsArrs exp : AbstractMemory list =
+let GetInitSignVarsArrs exp : Set<AbstractMemory> =
     let (v, a) = CollectVariablesArrays exp (Set.empty, Set.empty)
     let m1 = v
              |> Set.toList
@@ -196,21 +202,49 @@ let GetInitSignVarsArrs exp : AbstractMemory list =
              |> Set.toList
              |> List.collect InputInitSignArr
              |> Map.ofList
-    [(m1, m2)]
+    set[(m1, m2)]
     
+    
+let collectNodes edges =
+    Set.foldBack (fun (q1, _, q2) acc -> Set.add q1 (Set.add q2 acc)) edges Set.empty
+    
+let initAnalysis edges mem =
+    let nodes = collectNodes edges
+    seq {
+        for q in nodes do
+            if q = Node 0 then
+                (q, mem)
+            else
+                (q, Set.empty)
+    }
+    |> Map.ofSeq
+    
+let getFromSet s =
+    s
+    |> Set.toList
+    |> List.head
+
+let analyseEdge (q1, exp, q2) analysis =
+    let q1_mem = SignAnalyse (Map.find q1 analysis) exp
+    let q2_mem = Map.find q2 analysis
+    if not (Set.isSubset q1_mem q2_mem) then
+        let new_q2_map = Set.union q1_mem q2_mem
+        (set[q2], (Map.add q2 new_q2_map analysis))
+    else
+        (Set.empty, analysis)
+
 // Run Program Graph defined by edges and given a current node q and memory mem
-let rec RunSignAnalysisOnPG q (edges: Set<Edge>) (mem: AbstractMemory list) =
-    match q with
-        | Node 0 -> mem
-        | N      -> let currentEdges = edges
-                                       |> Set.filter (fun (_, _, q') -> q' = N)
-                    let previousMem = currentEdges
-                                      |> Set.map (fun (q', _, _) -> q')
-                                      |> Set.toList
-                                      |> List.collect (fun q' -> RunSignAnalysisOnPG q' edges mem)
-                    let currentExps = currentEdges
-                                      |> Set.map (fun (_, e, _) -> e)
-                    List.collect (SignAnalyse previousMem) (Set.toList currentExps)
+let rec RunSignAnalysisOnPG (worklist:Set<NodeType>) analysis (edges: Set<Edge>) =
+    if not worklist.IsEmpty then
+        let q = getFromSet worklist
+        let new_worklist = Set.difference worklist (set[q])
+        let active_edges = Set.filter (fun (q', _, _) -> q' = q) edges
+        let wl, an = Set.foldBack (fun e (w_acc, a_acc) -> let w, a = analyseEdge e a_acc
+                                                           (Set.union w w_acc), a
+                                  ) active_edges (new_worklist, analysis)
+        RunSignAnalysisOnPG wl an edges
+    else
+        analysis
 
 let PrintAbstractMemory (m1, m2) =
     Map.iter (fun _ v -> printf " %s " (OutputFromSign v)) m1
@@ -218,8 +252,8 @@ let PrintAbstractMemory (m1, m2) =
     printfn ""
     
 let PrintAbstractMemories mem =
-    let (m1, m2) = List.head mem
+    let (m1, m2) = List.head (Set.toList mem)
     Map.iter (fun k _ -> printf " %s " k) m1
-    Map.iter (fun k _ -> printf "   %s   " k) m2
+    Map.iter (fun k _ -> printf " %s " k) m2
     printfn ""
-    List.iter PrintAbstractMemory mem
+    Set.iter PrintAbstractMemory mem
