@@ -33,9 +33,11 @@ let main argv =
             let graphviz = GenerateGraphviz edges
             printf "%A" graphviz
         else if runSignAnalysis  then
-            let signs = GetInitSignVarsArrs (C ast)
-                        |> RunSignAnalysisOnPG EndNode edges
-            PrintAbstractMemories signs
+            let initMem = GetInitSignVarsArrs (C ast)
+            let initAnalysis = initAnalysis edges initMem            
+            let finalAnalysis = RunSignAnalysisOnPG (set[Node 0]) initAnalysis edges
+//            printf "%A" finalAnalysis
+            PrintAbstractMemories (Map.find EndNode finalAnalysis)
         else
             let state = GetInitVars (C ast)
                         |> RunPG (Node 0) edges
