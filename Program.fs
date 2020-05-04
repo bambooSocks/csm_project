@@ -7,7 +7,7 @@ open PGGenerator
 open GraphvizGenerator
 open Interpreter
 open Signs
-open SignAnalyzer
+open SignAnalyser
 
 let code = IO.File.ReadAllText "../../../code.gc"
 
@@ -26,6 +26,7 @@ let main argv =
     let isDet = List.contains "-d" argList 
     let showGraph = List.contains "--pg" argList
     let runSignAnalysis = List.contains "-s" argList
+    
 
     try
         let ast = parse code
@@ -33,11 +34,12 @@ let main argv =
         if showGraph then
             let graphviz = GenerateGraphviz edges
             printf "%A" graphviz
-        else if runSignAnalysis  then
+        else if (*runSignAnalysis*) true then
             let initMem = GetInitSignVarsArrs (C ast)
-            let initAnalysis = initAnalysis edges initMem            
+            printf "%A" initMem
+            let initAnalysis = initAnalysis edges initMem
             let finalAnalysis = RunSignAnalysisOnPG (set[Node 0]) initAnalysis edges
-//            printf "%A" finalAnalysis
+            //printf "%A" finalAnalysis
             PrintAbstractMemories (Map.find EndNode finalAnalysis)
         else
             let state = GetInitVars (C ast)

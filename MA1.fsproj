@@ -9,6 +9,7 @@
         <Content Include="code.gc" />
         <Content Include="GCLLexer.fsl" />
         <Content Include="GCLParser.fsp" />
+        <Compile Include="SecurityAnalyser.fs" />
         <Content Include="Makefile" />
         <Compile Include="GCLTypesAST.fs" />
         <Compile Include="GCLParser.fsi" />

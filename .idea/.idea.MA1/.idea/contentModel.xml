@@ -18,6 +18,7 @@
       <e p="PGGenerator.fs" t="Include" />
       <e p="Program.fs" t="Include" />
       <e p="README.md" t="Include" />
+      <e p="SecurityAnalyser.fs" t="Include" />
       <e p="SignAnalyser.fs" t="Include" />
       <e p="Signs.fs" t="Include" />
       <e p="bin" t="ExcludeRecursive" />
